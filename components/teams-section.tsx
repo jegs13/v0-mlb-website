@@ -212,3 +212,9 @@ export function TeamsSection() {
                 </div>
               )
             })}
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
