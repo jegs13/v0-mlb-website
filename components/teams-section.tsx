@@ -18,27 +18,17 @@ const divisions = [
 
 interface Team {
   id: string
-  displayName: string
-  shortDisplayName: string
-  abbreviation: string
-  location: string
   name: string
-  logos: Array<{ href: string }>
-  color?: string
-  alternateColor?: string
-  record?: {
-    items: Array<{
-      summary: string
-      stats: Array<{
-        name: string
-        value: number
-      }>
-    }>
-  }
-  groups?: {
-    id: string
-    name: string
-  }
+  abbr: string
+  location: string
+  nickname: string
+  division: string
+  wins: number
+  losses: number
+  logo: string
+  color: string
+  alternateColor: string
+  standingSummary: string
 }
 
 export function TeamsSection() {
@@ -68,10 +58,7 @@ export function TeamsSection() {
 
   const filteredTeams = selectedDivision === "all" 
     ? teams 
-    : teams.filter((team) => {
-        const divisionName = team.groups?.name?.toLowerCase().replace(/\s+/g, '-')
-        return divisionName === selectedDivision
-      })
+    : teams.filter((team) => team.division === selectedDivision)
 
   const sortedTeams = [...filteredTeams]
 
@@ -81,7 +68,7 @@ export function TeamsSection() {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
-            <h2 className="text-3xl md:text-4xl font-black text-foreground uppercase tracking-tight">All 32 Teams</h2>
+            <h2 className="text-3xl md:text-4xl font-black text-foreground uppercase tracking-tight">All 30 Teams</h2>
             <p className="text-muted-foreground mt-1">Browse team standings, stats, and information</p>
           </div>
           <div className="flex items-center gap-2">
@@ -150,9 +137,7 @@ export function TeamsSection() {
         {!isLoading && !error && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             {sortedTeams.map((team) => {
-              const wins = team.record?.items?.[0]?.stats?.find((s: any) => s.name === 'wins')?.value || 0
-              const losses = team.record?.items?.[0]?.stats?.find((s: any) => s.name === 'losses')?.value || 0
-              const winPct = wins + losses > 0 ? ((wins / (wins + losses)) * 100).toFixed(1) : "0.0"
+              const winPct = team.wins + team.losses > 0 ? ((team.wins / (team.wins + team.losses)) * 100).toFixed(1) : "0.0"
               
               return (
                 <div
@@ -163,22 +148,20 @@ export function TeamsSection() {
                   <div className="flex items-center gap-3 mb-3">
                     <div
                       className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden"
-                      style={{ backgroundColor: team.color ? `#${team.color}20` : '#ffffff20' }}
+                      style={{ backgroundColor: `${team.color}20` }}
                     >
-                      {team.logos && team.logos[0] && (
-                        <Image
-                          src={team.logos[0].href}
-                          alt={`${team.displayName} logo`}
-                          width={40}
-                          height={40}
-                          className="object-contain"
-                        />
-                      )}
+                      <Image
+                        src={team.logo}
+                        alt={`${team.name} logo`}
+                        width={40}
+                        height={40}
+                        className="object-contain"
+                      />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-foreground truncate">{team.shortDisplayName}</h3>
+                      <h3 className="font-bold text-foreground truncate">{team.nickname}</h3>
                       <p className="text-xs text-muted-foreground uppercase tracking-wider">
-                        {team.groups?.name || 'MLB'}
+                        {divisions.find(d => d.id === team.division)?.name || team.standingSummary}
                       </p>
                     </div>
                   </div>
@@ -186,16 +169,16 @@ export function TeamsSection() {
                   {/* Record */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl font-black text-foreground">{wins}</span>
+                      <span className="text-2xl font-black text-foreground">{team.wins}</span>
                       <span className="text-muted-foreground">-</span>
-                      <span className="text-2xl font-black text-muted-foreground">{losses}</span>
+                      <span className="text-2xl font-black text-muted-foreground">{team.losses}</span>
                     </div>
                     <Badge
                       variant="secondary"
                       className={`text-xs ${
-                        wins > losses
+                        team.wins > team.losses
                           ? "bg-green-500/20 text-green-400"
-                          : wins < losses
+                          : team.wins < team.losses
                             ? "bg-red-500/20 text-red-400"
                             : "bg-muted text-muted-foreground"
                       }`}
@@ -207,7 +190,7 @@ export function TeamsSection() {
                   {/* Hover Effect Bar */}
                   <div
                     className="h-1 mt-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{ backgroundColor: team.color ? `#${team.color}` : '#ffffff' }}
+                    style={{ backgroundColor: team.color }}
                   />
                 </div>
               )
