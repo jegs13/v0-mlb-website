@@ -3,6 +3,7 @@ import { NewsCarousel } from "@/components/news-carousel"
 import { ScoresTicker } from "@/components/scores-ticker"
 import { TeamsSection } from "@/components/teams-section"
 import { Footer } from "@/components/footer"
+import { ScrollToTop } from "@/components/scroll-to-top"
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
       <ScoresTicker />
       <TeamsSection />
       <Footer />
+      <ScrollToTop />
     </main>
   )
 }

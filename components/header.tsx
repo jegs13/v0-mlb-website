@@ -26,7 +26,7 @@ export function Header() {
             <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-lg">⚾</span>
             </div>
-            <span className="font-bold text-xl tracking-tight text-foreground">MLB CENTRAL</span>
+            <span className="font-bold text-xl tracking-tight text-foreground">HOME RUN COUNTRY</span>
           </Link>
 
           {/* Desktop Navigation */}
