@@ -51,10 +51,9 @@ export function TeamsSection() {
     setIsLoading(true)
     setError(null)
     try {
-      const response = await fetch('http://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams')
+      const response = await fetch('/api/teams')
       const data = await response.json()
-      const teamsData = data.sports[0].leagues[0].teams.map((t: any) => t.team)
-      setTeams(teamsData)
+      setTeams(data.teams || [])
     } catch (err) {
       console.error('Error fetching teams:', err)
       setError('Failed to load teams')
@@ -82,7 +81,7 @@ export function TeamsSection() {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
-            <h2 className="text-3xl md:text-4xl font-black text-foreground uppercase tracking-tight">All 30 Teams</h2>
+            <h2 className="text-3xl md:text-4xl font-black text-foreground uppercase tracking-tight">All 32 Teams</h2>
             <p className="text-muted-foreground mt-1">Browse team standings, stats, and information</p>
           </div>
           <div className="flex items-center gap-2">
@@ -213,9 +212,3 @@ export function TeamsSection() {
                 </div>
               )
             })}
-          </div>
-        )}
-      </div>
-    </section>
-  )
-}

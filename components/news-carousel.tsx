@@ -63,7 +63,7 @@ export function NewsCarousel() {
 
   if (isLoading) {
     return (
-      <section id="news" className="relative h-[70vh] min-h-[500px] bg-background flex items-center justify-center">
+      <section id="news" className="relative h-[50vh] min-h-[400px] bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <RefreshCw className="h-8 w-8 animate-spin text-primary" />
           <p className="text-muted-foreground">Loading latest news...</p>
@@ -73,7 +73,7 @@ export function NewsCarousel() {
   }
 
   return (
-    <section id="news" className="relative h-[70vh] min-h-[500px] overflow-hidden">
+    <section id="news" className="relative h-[50vh] min-h-[400px] overflow-hidden">
       {/* Slides */}
       {newsItems.map((item, index) => (
         <div
@@ -87,8 +87,9 @@ export function NewsCarousel() {
               src={item.image || "/placeholder.svg"}
               alt={item.title}
               fill
-              className="object-cover"
+              className="object-cover object-center"
               priority={index === 0}
+              quality={90}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
           </div>
@@ -98,10 +99,10 @@ export function NewsCarousel() {
             <span className="inline-block px-3 py-1 bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider rounded mb-4 w-fit">
               {item.category}
             </span>
-            <h2 className="text-4xl md:text-6xl font-black text-foreground mb-3 max-w-4xl leading-tight text-balance">
+            <h2 className="text-3xl md:text-5xl font-black text-foreground mb-3 max-w-3xl leading-tight text-balance">
               {item.title}
             </h2>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl line-clamp-2">{item.subtitle}</p>
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl line-clamp-2">{item.subtitle}</p>
             <div className="mt-6 flex gap-4">
               <Button
                 asChild
