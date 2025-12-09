@@ -63,77 +63,83 @@ export function NewsCarousel() {
 
   if (isLoading) {
     return (
-      <section id="news" className="relative h-[50vh] min-h-[400px] bg-background flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <RefreshCw className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading latest news...</p>
+      <section id="news" className="py-8 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="relative h-[350px] rounded-lg overflow-hidden flex items-center justify-center bg-card">
+            <div className="flex flex-col items-center gap-4">
+              <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-muted-foreground">Loading latest news...</p>
+            </div>
+          </div>
         </div>
       </section>
     )
   }
 
   return (
-    <section id="news" className="relative h-[50vh] min-h-[400px] overflow-hidden">
-      {/* Slides */}
-      {newsItems.map((item, index) => (
-        <div
-          key={item.id}
-          className={`absolute inset-0 transition-opacity duration-700 ${
-            index === currentSlide ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
-        >
-          <div className="absolute inset-0">
-            <Image
-              src={item.image || "/placeholder.svg"}
-              alt={item.title}
-              fill
-              className="object-cover object-center"
-              priority={index === 0}
-              quality={90}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-          </div>
+    <section id="news" className="py-8 bg-background">
+      <div className="container mx-auto px-4">
+        <div className="relative h-[350px] rounded-lg overflow-hidden">
+          {/* Slides */}
+          {newsItems.map((item, index) => (
+            <div
+              key={item.id}
+              className={`absolute inset-0 transition-opacity duration-700 ${
+                index === currentSlide ? "opacity-100" : "opacity-0 pointer-events-none"
+              }`}
+            >
+              <div className="absolute inset-0">
+                <Image
+                  src={item.image || "/placeholder.svg"}
+                  alt={item.title}
+                  fill
+                  className="object-cover object-center"
+                  priority={index === 0}
+                  quality={90}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+              </div>
 
-          {/* Content */}
-          <div className="relative h-full container mx-auto px-4 flex flex-col justify-end pb-16">
-            <span className="inline-block px-3 py-1 bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider rounded mb-4 w-fit">
-              {item.category}
-            </span>
-            <h2 className="text-3xl md:text-5xl font-black text-foreground mb-3 max-w-3xl leading-tight text-balance">
-              {item.title}
-            </h2>
-            <p className="text-base md:text-lg text-muted-foreground max-w-2xl line-clamp-2">{item.subtitle}</p>
-            <div className="mt-6 flex gap-4">
-              <Button
-                asChild
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-wider"
-              >
-                <a href={item.link} target="_blank" rel="noopener noreferrer">
-                  Read Full Story
-                </a>
-              </Button>
-              <Button
-                variant="outline"
-                className="border-foreground/30 text-foreground hover:bg-foreground/10 bg-transparent"
-                onClick={() => mutate()}
-              >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh News
-              </Button>
+              {/* Content */}
+              <div className="relative h-full flex flex-col justify-end p-8">
+                <span className="inline-block px-3 py-1 bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider rounded mb-3 w-fit">
+                  {item.category}
+                </span>
+                <h2 className="text-2xl md:text-3xl font-black text-foreground mb-2 max-w-2xl leading-tight text-balance">
+                  {item.title}
+                </h2>
+                <p className="text-sm md:text-base text-muted-foreground max-w-xl line-clamp-2 mb-4">{item.subtitle}</p>tle}</p>
+                <div className="flex gap-3">
+                  <Button
+                    asChild
+                    size="sm"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-wider"
+                  >
+                    <a href={item.link} target="_blank" rel="noopener noreferrer">
+                      Read Full Story
+                    </a>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-foreground/30 text-foreground hover:bg-foreground/10 bg-transparent"
+                    onClick={() => mutate()}
+                  >
+                    <RefreshCw className="h-3 w-3 mr-2" />
+                    Refresh
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      ))}
-
-      {/* Controls */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4">
+          ))}      {/* Controls */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3">
         <Button
           variant="ghost"
           size="icon"
           onClick={prevSlide}
-          className="rounded-full bg-background/50 hover:bg-background/80 text-foreground"
+          className="h-8 w-8 rounded-full bg-background/50 hover:bg-background/80 text-foreground"
         >
-          <ChevronLeft className="h-5 w-5" />
+          <ChevronLeft className="h-4 w-4" />
           <span className="sr-only">Previous slide</span>
         </Button>
 
@@ -155,9 +161,9 @@ export function NewsCarousel() {
           variant="ghost"
           size="icon"
           onClick={nextSlide}
-          className="rounded-full bg-background/50 hover:bg-background/80 text-foreground"
+          className="h-8 w-8 rounded-full bg-background/50 hover:bg-background/80 text-foreground"
         >
-          <ChevronRight className="h-5 w-5" />
+          <ChevronRight className="h-4 w-4" />
           <span className="sr-only">Next slide</span>
         </Button>
 
@@ -165,11 +171,13 @@ export function NewsCarousel() {
           variant="ghost"
           size="icon"
           onClick={() => setIsPlaying(!isPlaying)}
-          className="rounded-full bg-background/50 hover:bg-background/80 text-foreground ml-2"
+          className="h-8 w-8 rounded-full bg-background/50 hover:bg-background/80 text-foreground ml-2"
         >
-          {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+          {isPlaying ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
           <span className="sr-only">{isPlaying ? "Pause" : "Play"} slideshow</span>
         </Button>
+      </div>
+        </div>
       </div>
     </section>
   )
