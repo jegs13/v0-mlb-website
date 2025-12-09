@@ -108,7 +108,7 @@ export function NewsCarousel() {
                 <h2 className="text-2xl md:text-3xl font-black text-foreground mb-2 max-w-2xl leading-tight text-balance">
                   {item.title}
                 </h2>
-                <p className="text-sm md:text-base text-muted-foreground max-w-xl line-clamp-2 mb-4">{item.subtitle}</p>tle}</p>
+                <p className="text-sm md:text-base text-muted-foreground max-w-xl line-clamp-2 mb-4">{item.subtitle}</p>
                 <div className="flex gap-3">
                   <Button
                     asChild
