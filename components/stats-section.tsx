@@ -95,18 +95,16 @@ export function StatsSection() {
         throw new Error(data.error)
       }
 
-      // Process batting stats
-      if (data.batting?.stats?.[0]?.splits) {
-        const battingStats: PlayerStat[] = data.batting.stats[0].splits.map((s: any) => ({
+      // Process batting average leaders
+      if (data.battingAverage?.stats?.[0]?.splits) {
+        const avgStats: PlayerStat[] = data.battingAverage.stats[0].splits.map((s: any) => ({
           player: s.player,
           team: s.team,
           stat: s.stat
         }))
 
-        // Batting Average Leaders
-        const avgLeaders = battingStats
+        const avgLeaders = avgStats
           .filter(s => s.stat.avg && parseFloat(s.stat.avg) > 0)
-          .sort((a, b) => parseFloat(b.stat.avg!) - parseFloat(a.stat.avg!))
           .slice(0, 5)
           .map((s, i) => ({
             playerName: s.player.fullName,
@@ -115,11 +113,18 @@ export function StatsSection() {
             rank: i + 1
           }))
         setBattingAvgLeaders(avgLeaders)
+      }
 
-        // Home Run Leaders
-        const hrLeaders = battingStats
+      // Process home run leaders
+      if (data.homeRuns?.stats?.[0]?.splits) {
+        const hrStats: PlayerStat[] = data.homeRuns.stats[0].splits.map((s: any) => ({
+          player: s.player,
+          team: s.team,
+          stat: s.stat
+        }))
+
+        const hrLeaders = hrStats
           .filter(s => s.stat.homeRuns)
-          .sort((a, b) => (b.stat.homeRuns || 0) - (a.stat.homeRuns || 0))
           .slice(0, 5)
           .map((s, i) => ({
             playerName: s.player.fullName,
@@ -128,11 +133,18 @@ export function StatsSection() {
             rank: i + 1
           }))
         setHomeRunLeaders(hrLeaders)
+      }
 
-        // RBI Leaders
-        const rbiLeadersList = battingStats
+      // Process RBI leaders
+      if (data.rbi?.stats?.[0]?.splits) {
+        const rbiStats: PlayerStat[] = data.rbi.stats[0].splits.map((s: any) => ({
+          player: s.player,
+          team: s.team,
+          stat: s.stat
+        }))
+
+        const rbiLeadersList = rbiStats
           .filter(s => s.stat.rbi)
-          .sort((a, b) => (b.stat.rbi || 0) - (a.stat.rbi || 0))
           .slice(0, 5)
           .map((s, i) => ({
             playerName: s.player.fullName,
@@ -143,18 +155,16 @@ export function StatsSection() {
         setRbiLeaders(rbiLeadersList)
       }
 
-      // Process pitching stats
-      if (data.pitching?.stats?.[0]?.splits) {
-        const pitchingStats: PlayerStat[] = data.pitching.stats[0].splits.map((s: any) => ({
+      // Process ERA leaders
+      if (data.era?.stats?.[0]?.splits) {
+        const eraStats: PlayerStat[] = data.era.stats[0].splits.map((s: any) => ({
           player: s.player,
           team: s.team,
           stat: s.stat
         }))
 
-        // ERA Leaders (lowest is best)
-        const eraLeadersList = pitchingStats
+        const eraLeadersList = eraStats
           .filter(s => s.stat.era && parseFloat(s.stat.era) > 0)
-          .sort((a, b) => parseFloat(a.stat.era!) - parseFloat(b.stat.era!))
           .slice(0, 5)
           .map((s, i) => ({
             playerName: s.player.fullName,
@@ -163,11 +173,18 @@ export function StatsSection() {
             rank: i + 1
           }))
         setEraLeaders(eraLeadersList)
+      }
 
-        // Wins Leaders
-        const winsLeadersList = pitchingStats
+      // Process Wins leaders
+      if (data.wins?.stats?.[0]?.splits) {
+        const winsStats: PlayerStat[] = data.wins.stats[0].splits.map((s: any) => ({
+          player: s.player,
+          team: s.team,
+          stat: s.stat
+        }))
+
+        const winsLeadersList = winsStats
           .filter(s => s.stat.wins)
-          .sort((a, b) => (b.stat.wins || 0) - (a.stat.wins || 0))
           .slice(0, 5)
           .map((s, i) => ({
             playerName: s.player.fullName,
@@ -176,11 +193,18 @@ export function StatsSection() {
             rank: i + 1
           }))
         setWinsLeaders(winsLeadersList)
+      }
 
-        // Strikeout Leaders
-        const soLeaders = pitchingStats
+      // Process Strikeout leaders
+      if (data.strikeouts?.stats?.[0]?.splits) {
+        const soStats: PlayerStat[] = data.strikeouts.stats[0].splits.map((s: any) => ({
+          player: s.player,
+          team: s.team,
+          stat: s.stat
+        }))
+
+        const soLeaders = soStats
           .filter(s => s.stat.strikeOuts)
-          .sort((a, b) => (b.stat.strikeOuts || 0) - (a.stat.strikeOuts || 0))
           .slice(0, 5)
           .map((s, i) => ({
             playerName: s.player.fullName,
