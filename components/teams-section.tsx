@@ -5,6 +5,7 @@ import Image from "next/image"
 import { ChevronRight, RefreshCw, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { StandingsModal } from "@/components/standings-modal"
 
 const divisions = [
   { id: "all", name: "All Teams" },
@@ -36,6 +37,7 @@ export function TeamsSection() {
   const [teams, setTeams] = useState<Team[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showStandingsModal, setShowStandingsModal] = useState(false)
 
   const fetchTeams = async () => {
     setIsLoading(true)
@@ -84,6 +86,7 @@ export function TeamsSection() {
             <Button
               variant="outline"
               className="w-fit border-foreground/30 text-foreground hover:bg-foreground/10 bg-transparent"
+              onClick={() => setShowStandingsModal(true)}
             >
               View Full Standings
               <ChevronRight className="ml-2 h-4 w-4" />
@@ -135,7 +138,7 @@ export function TeamsSection() {
 
         {/* Teams Grid */}
         {!isLoading && !error && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             {sortedTeams.map((team) => {
               const winPct = team.wins + team.losses > 0 ? ((team.wins / (team.wins + team.losses)) * 100).toFixed(1) : "0.0"
               
@@ -198,6 +201,12 @@ export function TeamsSection() {
           </div>
         )}
       </div>
+
+      {/* Standings Modal */}
+      <StandingsModal 
+        isOpen={showStandingsModal} 
+        onClose={() => setShowStandingsModal(false)} 
+      />
     </section>
   )
 }
