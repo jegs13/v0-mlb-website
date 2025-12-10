@@ -50,7 +50,6 @@ export function StandingsModal({ isOpen, onClose }: StandingsModalProps) {
         throw new Error(data.error)
       }
 
-      // Parse the Sportradar API response
       const divisions: DivisionStanding[] = []
       
       if (data.league && data.league.season) {
