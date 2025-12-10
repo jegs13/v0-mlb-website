@@ -6,6 +6,7 @@ import { ChevronRight, RefreshCw, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { StandingsModal } from "@/components/standings-modal"
+import { TeamDetailsModal } from "@/components/team-details-modal"
 
 const divisions = [
   { id: "all", name: "All Teams" },
@@ -38,6 +39,7 @@ export function TeamsSection() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showStandingsModal, setShowStandingsModal] = useState(false)
+  const [selectedTeam, setSelectedTeam] = useState<{ id: number; name: string } | null>(null)
 
   const fetchTeams = async () => {
     setIsLoading(true)
@@ -146,6 +148,7 @@ export function TeamsSection() {
                 <div
                   key={team.id}
                   className="group bg-card rounded-lg p-4 border border-border hover:border-primary/50 transition-all cursor-pointer hover:scale-[1.02]"
+                  onClick={() => setSelectedTeam({ id: parseInt(team.id), name: team.name })}
                 >
                   {/* Team Logo & Name */}
                   <div className="flex items-center gap-3 mb-3">
@@ -207,6 +210,15 @@ export function TeamsSection() {
         isOpen={showStandingsModal} 
         onClose={() => setShowStandingsModal(false)} 
       />
+
+      {/* Team Details Modal */}
+      {selectedTeam && (
+        <TeamDetailsModal
+          teamId={selectedTeam.id}
+          teamName={selectedTeam.name}
+          onClose={() => setSelectedTeam(null)}
+        />
+      )}
     </section>
   )
 }
