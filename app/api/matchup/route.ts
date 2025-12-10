@@ -13,25 +13,30 @@ export async function GET(request: Request) {
       )
     }
 
-    // Fetch head-to-head games for 2024 season
-    // Get all games for team1 in 2024
-    const scheduleResponse = await fetch(
-      `https://statsapi.mlb.com/api/v1/schedule?sportId=1&season=2024&teamId=${team1Id}&hydrate=team,linescore`,
-      { cache: 'no-store' }
-    )
+    console.log(`Fetching matchup data for teams: ${team1Id} vs ${team2Id}`)
+    
+    // Fetch head-to-head games for 2025 season
+    // Get all games for team1 in 2025
+    const scheduleUrl = `https://statsapi.mlb.com/api/v1/schedule?sportId=1&season=2025&teamId=${team1Id}&hydrate=team,linescore`
+    console.log('Schedule URL:', scheduleUrl)
+    
+    const scheduleResponse = await fetch(scheduleUrl, { cache: 'no-store' })
 
     if (!scheduleResponse.ok) {
-      console.error('Schedule fetch failed:', scheduleResponse.status)
+      console.error('Schedule fetch failed:', scheduleResponse.status, scheduleResponse.statusText)
       return NextResponse.json(
-        { error: "Failed to fetch schedule data" },
+        { error: `Failed to fetch schedule data: ${scheduleResponse.status}` },
         { status: 500 }
       )
     }
 
     const scheduleData = await scheduleResponse.json()
+    console.log('Schedule data received, total dates:', scheduleData.dates?.length || 0)
     
     // Extract all games and filter for games against team2
     const allGames = scheduleData.dates?.flatMap((date: any) => date.games) || []
+    console.log('Total games for team1:', allGames.length)
+    
     const games = allGames.filter((game: any) => {
       const awayTeamId = game.teams.away.team.id
       const homeTeamId = game.teams.home.team.id
@@ -43,7 +48,7 @@ export async function GET(request: Request) {
     let team1Wins = 0
     let team2Wins = 0
 
-    console.log(`Found ${games.length} games between teams ${team1Id} and ${team2Id}`)
+    console.log(`Found ${games.length} head-to-head games between teams ${team1Id} and ${team2Id}`)
 
     games.forEach((game: any) => {
       if (game.status.statusCode === 'F' || game.status.abstractGameState === 'Final') {
