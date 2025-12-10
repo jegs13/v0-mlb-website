@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { RefreshCw, Loader2, Trophy } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import Image from "next/image"
 
 interface TeamStanding {
   id: string
@@ -18,11 +17,6 @@ interface TeamStanding {
   streak?: string
   is_division_leader?: boolean
   is_wildcard?: boolean
-}
-
-// Helper function to get team logo URL from ESPN
-const getTeamLogoUrl = (teamId: string) => {
-  return `https://a.espncdn.com/i/teamlogos/mlb/500/${teamId}.png`
 }
 
 interface DivisionStanding {
@@ -271,13 +265,6 @@ export function StandingsSection() {
                                 {team.is_wildcard && !team.is_division_leader && (
                                   <div className="h-2 w-2 rounded-full bg-green-500 flex-shrink-0" />
                                 )}
-                                <Image
-                                  src={getTeamLogoUrl(team.id)}
-                                  alt={team.name}
-                                  width={20}
-                                  height={20}
-                                  className="flex-shrink-0"
-                                />
                                 <span className="font-semibold text-foreground text-xs">
                                   {team.name}
                                 </span>
@@ -342,18 +329,9 @@ export function StandingsSection() {
                             </Badge>
                           </td>
                           <td className="p-3">
-                            <div className="flex items-center gap-2">
-                              <Image
-                                src={getTeamLogoUrl(team.id)}
-                                alt={team.name}
-                                width={24}
-                                height={24}
-                                className="flex-shrink-0"
-                              />
-                              <span className="font-semibold text-foreground">
-                                {team.name}
-                              </span>
-                            </div>
+                            <span className="font-semibold text-foreground">
+                              {team.name}
+                            </span>
                           </td>
                           <td className="text-center p-3 font-bold text-foreground">{team.win}</td>
                           <td className="text-center p-3 font-bold text-foreground">{team.loss}</td>
