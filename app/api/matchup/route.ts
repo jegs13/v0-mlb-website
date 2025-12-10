@@ -43,18 +43,39 @@ export async function GET(request: Request) {
     let team1Wins = 0
     let team2Wins = 0
 
+    console.log(`Found ${games.length} games between teams ${team1Id} and ${team2Id}`)
+
     games.forEach((game: any) => {
-      if (game.status.statusCode === 'F') {
-        const team1IsHome = game.teams.home.team.id === parseInt(team1Id)
-        const team1Won = team1IsHome ? game.teams.home.isWinner : game.teams.away.isWinner
+      if (game.status.statusCode === 'F' || game.status.abstractGameState === 'Final') {
+        const team1IdNum = parseInt(team1Id)
+        const team1IsHome = game.teams.home.team.id === team1IdNum
+        const team1IsAway = game.teams.away.team.id === team1IdNum
+        
+        let team1Won = false
+        
+        if (team1IsHome) {
+          // Team 1 is home team
+          const homeScore = game.teams.home.score || 0
+          const awayScore = game.teams.away.score || 0
+          team1Won = homeScore > awayScore
+        } else if (team1IsAway) {
+          // Team 1 is away team
+          const homeScore = game.teams.home.score || 0
+          const awayScore = game.teams.away.score || 0
+          team1Won = awayScore > homeScore
+        }
         
         if (team1Won) {
           team1Wins++
         } else {
           team2Wins++
         }
+        
+        console.log(`Game: ${game.teams.away.team.name} ${game.teams.away.score} @ ${game.teams.home.team.name} ${game.teams.home.score} - Team1 won: ${team1Won}`)
       }
     })
+
+    console.log(`Final record - Team1: ${team1Wins}, Team2: ${team2Wins}`)
 
     return NextResponse.json({
       games,
