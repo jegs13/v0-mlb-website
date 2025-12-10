@@ -13,10 +13,10 @@ export async function GET(request: Request) {
       )
     }
 
-    // Fetch head-to-head games for 2025 season
-    // Get all games for team1 in 2025
+    // Fetch head-to-head games for 2024 season
+    // Get all games for team1 in 2024
     const scheduleResponse = await fetch(
-      `https://statsapi.mlb.com/api/v1/schedule?sportId=1&season=2025&teamId=${team1Id}&hydrate=team,linescore`,
+      `https://statsapi.mlb.com/api/v1/schedule?sportId=1&season=2024&teamId=${team1Id}&hydrate=team,linescore`,
       { cache: 'no-store' }
     )
 
