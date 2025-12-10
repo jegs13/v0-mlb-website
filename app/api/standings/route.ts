@@ -13,8 +13,8 @@ export async function GET() {
       )
     }
     
-    // Try with api_key in URL parameter (Sportradar standard)
-    const url = `https://api.sportradar.us/mlb/trial/v7/en/seasons/2024/REG/standings.json?api_key=${apiKey}`
+    // Try production endpoint format (some trial keys work here)
+    const url = `https://api.sportradar.us/mlb/trial/v7.0/en/seasons/2024/REG/standings.json?api_key=${apiKey}`
     console.log('Fetching from URL:', url.replace(apiKey, 'HIDDEN'))
     
     const response = await fetch(url, {
