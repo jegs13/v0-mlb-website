@@ -2,49 +2,38 @@ import { NextResponse } from "next/server"
 
 export async function GET() {
   try {
-    const apiKey = process.env.SPORTRADAR_API_KEY
+    // MLB Stats API - free, no authentication required
+    // leagueId 103 = American League, 104 = National League
+    const alUrl = 'https://statsapi.mlb.com/api/v1/standings?leagueId=103'
+    const nlUrl = 'https://statsapi.mlb.com/api/v1/standings?leagueId=104'
     
-    console.log('API Key exists:', !!apiKey)
+    console.log('Fetching AL standings from:', alUrl)
+    console.log('Fetching NL standings from:', nlUrl)
     
-    if (!apiKey) {
+    const [alResponse, nlResponse] = await Promise.all([
+      fetch(alUrl, { cache: 'no-store' }),
+      fetch(nlUrl, { cache: 'no-store' })
+    ])
+
+    if (!alResponse.ok || !nlResponse.ok) {
+      console.error(`MLB API error - AL: ${alResponse.status}, NL: ${nlResponse.status}`)
       return NextResponse.json(
-        { error: "API key not configured" },
+        { error: "Failed to fetch standings data" },
         { status: 500 }
       )
     }
+
+    const [alData, nlData] = await Promise.all([
+      alResponse.json(),
+      nlResponse.json()
+    ])
     
-    // Try production endpoint format (some trial keys work here)
-    const url = `https://api.sportradar.us/mlb/trial/v7.0/en/seasons/2024/REG/standings.json?api_key=${apiKey}`
-    console.log('Fetching from URL:', url.replace(apiKey, 'HIDDEN'))
-    
-    const response = await fetch(url, {
-      headers: {
-        Accept: "application/json",
-      },
-      cache: 'no-store',
-    })
-
-    console.log('Response status:', response.status)
-    const responseText = await response.text()
-    console.log('Response text (first 500 chars):', responseText.substring(0, 500))
-
-    if (!response.ok) {
-      console.error(`Sportradar API error: ${response.status} - ${responseText}`)
-      return NextResponse.json(
-        { 
-          error: "Failed to fetch standings data", 
-          details: responseText,
-          status: response.status,
-          url: url.replace(apiKey, 'HIDDEN')
-        },
-        { status: response.status }
-      )
-    }
-
-    const data = JSON.parse(responseText)
     console.log('Successfully fetched standings data')
 
-    return NextResponse.json(data)
+    return NextResponse.json({
+      americanLeague: alData,
+      nationalLeague: nlData
+    })
   } catch (error) {
     console.error("Error fetching standings:", error)
     return NextResponse.json(

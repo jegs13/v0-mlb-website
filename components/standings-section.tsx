@@ -53,57 +53,78 @@ export function StandingsSection() {
         throw new Error(data.error + (data.details ? ': ' + data.details : ''))
       }
 
-      // Parse the Sportradar API response
+      // Parse the MLB Stats API response
       const leagues: LeagueStanding[] = []
       
-      if (data.league && data.league.season && data.league.season.leagues) {
-        data.league.season.leagues.forEach((league: any) => {
-          const divisions: DivisionStanding[] = []
-          
-          if (league.divisions) {
-            league.divisions.forEach((division: any) => {
-              divisions.push({
-                id: division.id,
-                name: division.name,
-                alias: division.alias,
-                teams: division.teams.map((team: any, index: number) => ({
-                  id: team.id,
-                  name: team.name,
-                  market: team.market,
-                  abbr: team.abbr,
-                  win: team.win,
-                  loss: team.loss,
-                  games_back: team.games_back,
-                  win_p: team.win_p,
-                  streak: team.streak?.kind && team.streak?.length 
-                    ? `${team.streak.kind === 'win' ? 'W' : 'L'}${team.streak.length}`
-                    : undefined,
-                  is_division_leader: index === 0
-                }))
-              })
-            })
-          }
+      // Process American League
+      if (data.americanLeague?.records) {
+        const divisions: DivisionStanding[] = data.americanLeague.records.map((division: any) => ({
+          id: division.division.id,
+          name: division.division.name,
+          alias: division.division.abbreviation || division.division.nameShort,
+          teams: division.teamRecords.map((team: any, index: number) => ({
+            id: team.team.id,
+            name: team.team.name,
+            market: '',
+            abbr: team.team.abbreviation || team.team.teamCode,
+            win: team.wins,
+            loss: team.losses,
+            games_back: parseFloat(team.gamesBack) || 0,
+            win_p: parseFloat(team.winningPercentage) || 0,
+            streak: team.streak?.streakCode,
+            is_division_leader: index === 0
+          }))
+        }))
 
-          // Calculate wildcard positions
-          const allTeams = divisions.flatMap(d => d.teams)
-          const divisionLeaders = divisions.map(d => d.teams[0])
-          const nonLeaders = allTeams.filter(t => !t.is_division_leader)
-          const wildcardTeams = nonLeaders
-            .sort((a, b) => b.win_p - a.win_p)
-            .slice(0, 3)
-          
-          wildcardTeams.forEach(team => {
-            team.is_wildcard = true
-          })
-
-          leagues.push({
-            id: league.id,
-            name: league.name,
-            alias: league.alias,
-            divisions
-          })
+        leagues.push({
+          id: '103',
+          name: 'American League',
+          alias: 'AL',
+          divisions
         })
       }
+
+      // Process National League
+      if (data.nationalLeague?.records) {
+        const divisions: DivisionStanding[] = data.nationalLeague.records.map((division: any) => ({
+          id: division.division.id,
+          name: division.division.name,
+          alias: division.division.abbreviation || division.division.nameShort,
+          teams: division.teamRecords.map((team: any, index: number) => ({
+            id: team.team.id,
+            name: team.team.name,
+            market: '',
+            abbr: team.team.abbreviation || team.team.teamCode,
+            win: team.wins,
+            loss: team.losses,
+            games_back: parseFloat(team.gamesBack) || 0,
+            win_p: parseFloat(team.winningPercentage) || 0,
+            streak: team.streak?.streakCode,
+            is_division_leader: index === 0
+          }))
+        }))
+
+        leagues.push({
+          id: '104',
+          name: 'National League',
+          alias: 'NL',
+          divisions
+        })
+      }
+
+      // Calculate wildcard positions for both leagues
+      leagues.forEach(league => {
+        const allTeams = league.divisions.flatMap(d => d.teams)
+        const divisionLeaders = league.divisions.map(d => d.teams[0])
+        const nonLeaders = allTeams.filter(t => !t.is_division_leader)
+        const wildcardTeams = nonLeaders
+          .sort((a, b) => b.win_p - a.win_p)
+          .slice(0, 3)
+        
+        wildcardTeams.forEach(team => {
+          team.is_wildcard = true
+        })
+      })
 
       setStandings(leagues)
     } catch (err) {
