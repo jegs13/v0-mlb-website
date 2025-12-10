@@ -93,9 +93,9 @@ export function NewsCarousel() {
                   src={item.image || "/placeholder.svg"}
                   alt={item.title}
                   fill
-                  className="object-cover object-center"
+                  className="object-contain object-center bg-black"
                   priority={index === 0}
-                  quality={90}
+                  quality={95}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
               </div>
