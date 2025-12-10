@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { RefreshCw, Loader2, Trophy } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import Image from "next/image"
 
 interface TeamStanding {
   id: string
@@ -17,6 +18,11 @@ interface TeamStanding {
   streak?: string
   is_division_leader?: boolean
   is_wildcard?: boolean
+}
+
+// Helper function to get team logo URL from ESPN
+const getTeamLogoUrl = (teamId: string) => {
+  return `https://a.espncdn.com/i/teamlogos/mlb/500/${teamId}.png`
 }
 
 interface DivisionStanding {
@@ -241,12 +247,12 @@ export function StandingsSection() {
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-border text-xs text-muted-foreground">
-                          <th className="text-left p-2 font-semibold">Team</th>
-                          <th className="text-center p-2 font-semibold">W</th>
-                          <th className="text-center p-2 font-semibold">L</th>
-                          <th className="text-center p-2 font-semibold">PCT</th>
-                          <th className="text-center p-2 font-semibold">GB</th>
+                        <tr className="border-b border-border text-xs">
+                          <th className="text-left p-2 font-semibold text-foreground">Team</th>
+                          <th className="text-center p-2 font-semibold text-foreground">W</th>
+                          <th className="text-center p-2 font-semibold text-foreground">L</th>
+                          <th className="text-center p-2 font-semibold text-foreground">PCT</th>
+                          <th className="text-center p-2 font-semibold text-foreground">GB</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -265,17 +271,24 @@ export function StandingsSection() {
                                 {team.is_wildcard && !team.is_division_leader && (
                                   <div className="h-2 w-2 rounded-full bg-green-500 flex-shrink-0" />
                                 )}
+                                <Image
+                                  src={getTeamLogoUrl(team.id)}
+                                  alt={team.name}
+                                  width={20}
+                                  height={20}
+                                  className="flex-shrink-0"
+                                />
                                 <span className="font-semibold text-foreground text-xs">
-                                  {team.market}
+                                  {team.name}
                                 </span>
                               </div>
                             </td>
                             <td className="text-center p-2 font-bold text-foreground">{team.win}</td>
-                            <td className="text-center p-2 font-bold text-muted-foreground">{team.loss}</td>
+                            <td className="text-center p-2 font-bold text-foreground">{team.loss}</td>
                             <td className="text-center p-2 text-foreground">
-                              {(team.win_p * 100).toFixed(0)}
+                              .{(team.win_p * 1000).toFixed(0)}
                             </td>
-                            <td className="text-center p-2 text-muted-foreground">
+                            <td className="text-center p-2 text-foreground">
                               {team.games_back !== undefined && team.games_back > 0 
                                 ? team.games_back.toFixed(1) 
                                 : '-'}
@@ -300,14 +313,14 @@ export function StandingsSection() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-border text-xs text-muted-foreground">
-                      <th className="text-left p-3 font-semibold">Rank</th>
-                      <th className="text-left p-3 font-semibold">Team</th>
-                      <th className="text-center p-3 font-semibold">W</th>
-                      <th className="text-center p-3 font-semibold">L</th>
-                      <th className="text-center p-3 font-semibold">PCT</th>
-                      <th className="text-center p-3 font-semibold">GB</th>
-                      <th className="text-center p-3 font-semibold">STRK</th>
+                    <tr className="border-b border-border text-xs">
+                      <th className="text-left p-3 font-semibold text-foreground">Rank</th>
+                      <th className="text-left p-3 font-semibold text-foreground">Team</th>
+                      <th className="text-center p-3 font-semibold text-foreground">W</th>
+                      <th className="text-center p-3 font-semibold text-foreground">L</th>
+                      <th className="text-center p-3 font-semibold text-foreground">PCT</th>
+                      <th className="text-center p-3 font-semibold text-foreground">GB</th>
+                      <th className="text-center p-3 font-semibold text-foreground">STRK</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -328,15 +341,26 @@ export function StandingsSection() {
                               {index + 1}
                             </Badge>
                           </td>
-                          <td className="p-3 font-semibold text-foreground">
-                            {team.market} {team.name}
+                          <td className="p-3">
+                            <div className="flex items-center gap-2">
+                              <Image
+                                src={getTeamLogoUrl(team.id)}
+                                alt={team.name}
+                                width={24}
+                                height={24}
+                                className="flex-shrink-0"
+                              />
+                              <span className="font-semibold text-foreground">
+                                {team.name}
+                              </span>
+                            </div>
                           </td>
                           <td className="text-center p-3 font-bold text-foreground">{team.win}</td>
-                          <td className="text-center p-3 font-bold text-muted-foreground">{team.loss}</td>
+                          <td className="text-center p-3 font-bold text-foreground">{team.loss}</td>
                           <td className="text-center p-3 text-foreground">
-                            {(team.win_p * 100).toFixed(1)}
+                            .{(team.win_p * 1000).toFixed(0)}
                           </td>
-                          <td className="text-center p-3 text-muted-foreground">
+                          <td className="text-center p-3 text-foreground">
                             {wcGB > 0 ? wcGB.toFixed(1) : '-'}
                           </td>
                           <td className="text-center p-3">
