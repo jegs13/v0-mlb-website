@@ -5,6 +5,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const team1Id = searchParams.get('team1Id')
     const team2Id = searchParams.get('team2Id')
+    const season = searchParams.get('season') || '2025'
     
     if (!team1Id || !team2Id) {
       return NextResponse.json(
@@ -13,11 +14,11 @@ export async function GET(request: Request) {
       )
     }
 
-    console.log(`Fetching matchup data for teams: ${team1Id} vs ${team2Id}`)
+    console.log(`Fetching matchup data for teams: ${team1Id} vs ${team2Id} - Season: ${season}`)
     
-    // Fetch head-to-head games for 2025 season
-    // Get all games for team1 in 2025
-    const scheduleUrl = `https://statsapi.mlb.com/api/v1/schedule?sportId=1&season=2025&teamId=${team1Id}&hydrate=team,linescore`
+    // Fetch head-to-head games for selected season
+    // Get all games for team1 in the selected season
+    const scheduleUrl = `https://statsapi.mlb.com/api/v1/schedule?sportId=1&season=${season}&teamId=${team1Id}&hydrate=team,linescore`
     console.log('Schedule URL:', scheduleUrl)
     
     const scheduleResponse = await fetch(scheduleUrl, { cache: 'no-store' })

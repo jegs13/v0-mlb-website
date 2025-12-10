@@ -54,6 +54,7 @@ export function StatsSection() {
   // Matchup state
   const [selectedMatchupTeam1, setSelectedMatchupTeam1] = useState<string>("")
   const [selectedMatchupTeam2, setSelectedMatchupTeam2] = useState<string>("")
+  const [selectedSeason, setSelectedSeason] = useState<string>("2025")
   const [matchupData, setMatchupData] = useState<any>(null)
   const [matchupLoading, setMatchupLoading] = useState(false)
 
@@ -215,13 +216,13 @@ export function StatsSection() {
     }
   }
 
-  const fetchMatchup = async (team1Id: string, team2Id: string) => {
+  const fetchMatchup = async (team1Id: string, team2Id: string, season: string) => {
     if (!team1Id || !team2Id) return
     
     setMatchupLoading(true)
     try {
-      console.log('Fetching matchup for teams:', team1Id, team2Id)
-      const response = await fetch(`/api/matchup?team1Id=${team1Id}&team2Id=${team2Id}`)
+      console.log('Fetching matchup for teams:', team1Id, team2Id, 'Season:', season)
+      const response = await fetch(`/api/matchup?team1Id=${team1Id}&team2Id=${team2Id}&season=${season}`)
       const data = await response.json()
       console.log('Matchup response:', data)
       
@@ -259,11 +260,11 @@ export function StatsSection() {
 
   useEffect(() => {
     if (selectedMatchupTeam1 && selectedMatchupTeam2) {
-      fetchMatchup(selectedMatchupTeam1, selectedMatchupTeam2)
+      fetchMatchup(selectedMatchupTeam1, selectedMatchupTeam2, selectedSeason)
     } else {
       setMatchupData(null)
     }
-  }, [selectedMatchupTeam1, selectedMatchupTeam2])
+  }, [selectedMatchupTeam1, selectedMatchupTeam2, selectedSeason])
 
 
   const StatCard = ({ title, leaders, icon }: { title: string; leaders: StatLeader[]; icon: React.ReactNode }) => (
@@ -440,6 +441,23 @@ export function StatsSection() {
                   <h3 className="font-bold text-foreground uppercase tracking-wide">Head-to-Head Comparison</h3>
                 </div>
                 <div className="p-4">
+                  {/* Season Selection */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-muted-foreground mb-2">Season</label>
+                    <select
+                      value={selectedSeason}
+                      onChange={(e) => setSelectedSeason(e.target.value)}
+                      className="w-full md:w-48 p-2 rounded-lg bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    >
+                      <option value="2025">2025</option>
+                      <option value="2024">2024</option>
+                      <option value="2023">2023</option>
+                      <option value="2022">2022</option>
+                      <option value="2021">2021</option>
+                      <option value="2020">2020</option>
+                    </select>
+                  </div>
+
                   {/* Team Selection */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div>
@@ -504,7 +522,7 @@ export function StatsSection() {
                       {/* Recent Games */}
                       {matchupData.games.length > 0 && (
                         <div>
-                          <h4 className="font-semibold text-foreground mb-3">2025 Season Games</h4>
+                          <h4 className="font-semibold text-foreground mb-3">{selectedSeason} Season Games</h4>
                           <div className="space-y-2 max-h-64 overflow-y-auto">
                             {matchupData.games.slice(0, 10).map((game: any) => {
                               const team1IsHome = game.teams.home.team.id === parseInt(selectedMatchupTeam1)
