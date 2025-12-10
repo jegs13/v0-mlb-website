@@ -3,8 +3,8 @@ import { NextResponse } from "next/server"
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    const team1Id = searchParams.get('team1')
-    const team2Id = searchParams.get('team2')
+    const team1Id = searchParams.get('team1Id')
+    const team2Id = searchParams.get('team2Id')
     
     if (!team1Id || !team2Id) {
       return NextResponse.json(
