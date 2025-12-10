@@ -64,6 +64,7 @@ interface TeamGame {
 export function StatsSection() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selectedLeague, setSelectedLeague] = useState<'all' | 'AL' | 'NL'>('all')
   
   const [battingAvgLeaders, setBattingAvgLeaders] = useState<StatLeader[]>([])
   const [homeRunLeaders, setHomeRunLeaders] = useState<StatLeader[]>([])
@@ -87,7 +88,7 @@ export function StatsSection() {
     setIsLoading(true)
     setError(null)
     try {
-      const response = await fetch('/api/stats')
+      const response = await fetch(`/api/stats?league=${selectedLeague}`)
       const data = await response.json()
       
       if (data.error) {
@@ -202,7 +203,7 @@ export function StatsSection() {
     fetchStats()
     fetchTodayGames()
     fetchTeams()
-  }, [])
+  }, [selectedLeague])
 
   const fetchTodayGames = async () => {
     setGamesLoading(true)
@@ -340,15 +341,43 @@ export function StatsSection() {
             </h2>
             <p className="text-muted-foreground mt-1">Top performers of the season</p>
           </div>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={fetchStats}
-            disabled={isLoading}
-            className="border-foreground/30 text-foreground hover:bg-foreground/10 bg-transparent"
-          >
-            <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-          </Button>
+          <div className="flex items-center gap-2">
+            <div className="flex bg-muted rounded-lg p-1 border border-border">
+              <Button
+                variant={selectedLeague === 'all' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setSelectedLeague('all')}
+                className="text-xs font-semibold"
+              >
+                ALL
+              </Button>
+              <Button
+                variant={selectedLeague === 'AL' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setSelectedLeague('AL')}
+                className="text-xs font-semibold"
+              >
+                AL
+              </Button>
+              <Button
+                variant={selectedLeague === 'NL' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setSelectedLeague('NL')}
+                className="text-xs font-semibold"
+              >
+                NL
+              </Button>
+            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={fetchStats}
+              disabled={isLoading}
+              className="border-foreground/30 text-foreground hover:bg-foreground/10 bg-transparent"
+            >
+              <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+            </Button>
+          </div>
         </div>
 
         {/* Loading State */}
