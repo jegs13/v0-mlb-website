@@ -14,30 +14,30 @@ export async function GET(request: Request) {
     }
 
     // Fetch head-to-head games for 2025 season
+    // Get all games for team1 in 2025
     const scheduleResponse = await fetch(
-      `https://statsapi.mlb.com/api/v1/schedule?sportId=1&season=2025&teamId=${team1Id}&opponentId=${team2Id}&hydrate=team,linescore`,
+      `https://statsapi.mlb.com/api/v1/schedule?sportId=1&season=2025&teamId=${team1Id}&hydrate=team,linescore`,
       { cache: 'no-store' }
     )
 
-    // Fetch current season stats for both teams
-    const [team1StatsResponse, team2StatsResponse] = await Promise.all([
-      fetch(`https://statsapi.mlb.com/api/v1/teams/${team1Id}/stats?stats=season&group=hitting,pitching&season=2025`, { cache: 'no-store' }),
-      fetch(`https://statsapi.mlb.com/api/v1/teams/${team2Id}/stats?stats=season&group=hitting,pitching&season=2025`, { cache: 'no-store' })
-    ])
-
-    if (!scheduleResponse.ok || !team1StatsResponse.ok || !team2StatsResponse.ok) {
+    if (!scheduleResponse.ok) {
+      console.error('Schedule fetch failed:', scheduleResponse.status)
       return NextResponse.json(
-        { error: "Failed to fetch matchup data" },
+        { error: "Failed to fetch schedule data" },
         { status: 500 }
       )
     }
 
     const scheduleData = await scheduleResponse.json()
-    const team1Stats = await team1StatsResponse.json()
-    const team2Stats = await team2StatsResponse.json()
-
-    // Extract games from schedule
-    const games = scheduleData.dates?.flatMap((date: any) => date.games) || []
+    
+    // Extract all games and filter for games against team2
+    const allGames = scheduleData.dates?.flatMap((date: any) => date.games) || []
+    const games = allGames.filter((game: any) => {
+      const awayTeamId = game.teams.away.team.id
+      const homeTeamId = game.teams.home.team.id
+      const team2IdNum = parseInt(team2Id)
+      return (awayTeamId === team2IdNum || homeTeamId === team2IdNum)
+    })
 
     // Calculate head-to-head record
     let team1Wins = 0
@@ -61,9 +61,7 @@ export async function GET(request: Request) {
       record: {
         team1Wins,
         team2Wins
-      },
-      team1Stats: team1Stats.stats || [],
-      team2Stats: team2Stats.stats || []
+      }
     })
   } catch (error) {
     console.error("Error fetching matchup:", error)
