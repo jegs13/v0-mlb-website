@@ -336,7 +336,7 @@ export function StatsSection() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
             <h2 className="text-3xl md:text-4xl font-black text-foreground uppercase tracking-tight">
-              2024 League Leaders
+              2025 League Leaders
             </h2>
             <p className="text-muted-foreground mt-1">Top performers of the season</p>
           </div>
