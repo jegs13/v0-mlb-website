@@ -93,7 +93,9 @@ export function TeamDetailsModal({ teamId, teamName, onClose }: TeamDetailsModal
             <h2 className="text-2xl font-bold">{teamName}</h2>
             {teamInfo && (
               <p className="text-sm opacity-90 mt-1">
-                {teamInfo.record?.records?.[0]?.wins}-{teamInfo.record?.records?.[0]?.losses} • {teamInfo.division?.name}
+                {teamInfo.record?.items?.[0]?.stats?.find((s: any) => s.name === 'wins')?.value || 0}-
+                {teamInfo.record?.items?.[0]?.stats?.find((s: any) => s.name === 'losses')?.value || 0} • 
+                {teamInfo.groups?.name || teamInfo.location || ''}
               </p>
             )}
           </div>

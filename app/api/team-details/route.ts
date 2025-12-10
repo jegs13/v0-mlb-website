@@ -12,29 +12,28 @@ export async function GET(request: Request) {
       )
     }
 
-    // Fetch team roster and recent/upcoming games
-    const [rosterResponse, scheduleResponse, teamInfoResponse] = await Promise.all([
-      fetch(`https://statsapi.mlb.com/api/v1/teams/${teamId}/roster?rosterType=active`, { cache: 'no-store' }),
+    // Fetch team info from ESPN API and games from MLB Stats API
+    const [espnResponse, scheduleResponse, rosterResponse] = await Promise.all([
+      fetch(`http://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/${teamId}`, { cache: 'no-store' }),
       fetch(`https://statsapi.mlb.com/api/v1/schedule?teamId=${teamId}&season=2025&sportId=1&hydrate=team,linescore`, { cache: 'no-store' }),
-      fetch(`https://statsapi.mlb.com/api/v1/teams/${teamId}?hydrate=record`, { cache: 'no-store' })
+      fetch(`https://statsapi.mlb.com/api/v1/teams/${teamId}/roster?rosterType=active`, { cache: 'no-store' })
     ])
 
-    if (!rosterResponse.ok || !scheduleResponse.ok || !teamInfoResponse.ok) {
+    if (!espnResponse.ok || !scheduleResponse.ok || !rosterResponse.ok) {
       return NextResponse.json(
         { error: "Failed to fetch team details" },
         { status: 500 }
       )
     }
 
-    const [rosterData, scheduleData, teamInfoData] = await Promise.all([
-      rosterResponse.json(),
+    const [espnData, scheduleData, rosterData] = await Promise.all([
+      espnResponse.json(),
       scheduleResponse.json(),
-      teamInfoResponse.json()
+      rosterResponse.json()
     ])
 
     // Get today's date
     const today = new Date()
-    const todayStr = today.toISOString().split('T')[0]
 
     // Process all games
     const allGames = scheduleData.dates?.flatMap((date: any) => date.games) || []
@@ -57,10 +56,10 @@ export async function GET(request: Request) {
       .sort((a: any, b: any) => new Date(a.gameDate).getTime() - new Date(b.gameDate).getTime())[0]
 
     return NextResponse.json({
+      teamInfo: espnData.team || null,
       roster: rosterData.roster || [],
       lastGames: pastGames,
-      nextGame: nextGame || null,
-      teamInfo: teamInfoData.teams?.[0] || null
+      nextGame: nextGame || null
     })
   } catch (error) {
     console.error("Error fetching team details:", error)
