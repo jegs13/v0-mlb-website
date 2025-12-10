@@ -152,22 +152,14 @@ export function ScheduleSection() {
               type="date"
               value={selectedDate.toISOString().split('T')[0]}
               onChange={(e) => {
-                const newDate = new Date(e.target.value + 'T12:00:00')
-                setSelectedDate(newDate)
+                if (e.target.value) {
+                  const newDate = new Date(e.target.value + 'T12:00:00')
+                  setSelectedDate(newDate)
+                }
               }}
-              className="hidden"
-              id="date-picker"
+              className="p-2 rounded-lg bg-muted border border-border text-foreground cursor-pointer"
+              style={{ width: 'auto' }}
             />
-            <label htmlFor="date-picker">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-primary hover:bg-primary/10"
-                onClick={() => document.getElementById('date-picker')?.click()}
-              >
-                <Calendar className="h-5 w-5" />
-              </Button>
-            </label>
             <h3 className="text-lg font-bold text-foreground">
               {formatDate(selectedDate)}
             </h3>

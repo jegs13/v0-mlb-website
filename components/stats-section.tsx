@@ -327,8 +327,10 @@ export function StatsSection() {
     
     setMatchupLoading(true)
     try {
+      console.log('Fetching matchup for teams:', team1Id, team2Id)
       const response = await fetch(`/api/matchup?team1Id=${team1Id}&team2Id=${team2Id}`)
       const data = await response.json()
+      console.log('Matchup response:', data)
       
       if (data.error) {
         console.error('Error fetching matchup:', data.error)
