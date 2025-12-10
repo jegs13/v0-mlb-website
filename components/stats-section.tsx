@@ -37,30 +37,6 @@ interface StatLeader {
   rank: number
 }
 
-interface TodayGame {
-  gamePk: number
-  gameDate: string
-  teams: {
-    away: { team: { name: string }; score?: number }
-    home: { team: { name: string }; score?: number }
-  }
-  status: {
-    detailedState: string
-  }
-  linescore?: {
-    currentInning?: number
-    inningState?: string
-  }
-}
-
-interface TeamGame {
-  date: string
-  opponent: string
-  result: string
-  score: string
-  homeAway: string
-}
-
 export function StatsSection() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -73,14 +49,6 @@ export function StatsSection() {
   const [winsLeaders, setWinsLeaders] = useState<StatLeader[]>([])
   const [strikeoutLeaders, setStrikeoutLeaders] = useState<StatLeader[]>([])
 
-  // Today's games state
-  const [todayGames, setTodayGames] = useState<TodayGame[]>([])
-  const [gamesLoading, setGamesLoading] = useState(false)
-
-  // Team games state
-  const [selectedTeamId, setSelectedTeamId] = useState<string>("")
-  const [teamGames, setTeamGames] = useState<TeamGame[]>([])
-  const [teamGamesLoading, setTeamGamesLoading] = useState(false)
   const [teams, setTeams] = useState<Array<{ id: number; name: string }>>([])
 
   // Matchup state
@@ -231,32 +199,8 @@ export function StatsSection() {
 
   useEffect(() => {
     fetchStats()
-    fetchTodayGames()
     fetchTeams()
   }, [selectedLeague])
-
-  const fetchTodayGames = async () => {
-    setGamesLoading(true)
-    try {
-      const response = await fetch('/api/today-games')
-      const data = await response.json()
-      
-      if (data.error) {
-        console.error('Error fetching today\'s games:', data.error)
-        return
-      }
-
-      if (data.dates && data.dates.length > 0 && data.dates[0].games) {
-        setTodayGames(data.dates[0].games)
-      } else {
-        setTodayGames([])
-      }
-    } catch (err) {
-      console.error('Error fetching today\'s games:', err)
-    } finally {
-      setGamesLoading(false)
-    }
-  }
 
   const fetchTeams = async () => {
     try {
@@ -270,57 +214,6 @@ export function StatsSection() {
       console.error('Error fetching teams:', err)
     }
   }
-
-  const fetchTeamGames = async (teamId: string) => {
-    if (!teamId) return
-    
-    setTeamGamesLoading(true)
-    try {
-      const response = await fetch(`/api/team-games?teamId=${teamId}`)
-      const data = await response.json()
-      
-      if (data.error) {
-        console.error('Error fetching team games:', data.error)
-        setTeamGames([])
-        return
-      }
-
-      if (data.dates) {
-        const games: TeamGame[] = []
-        data.dates.forEach((date: any) => {
-          date.games.forEach((game: any) => {
-            const isHome = game.teams.home.team.id === parseInt(teamId)
-            const opponent = isHome ? game.teams.away.team.name : game.teams.home.team.name
-            const teamScore = isHome ? game.teams.home.score : game.teams.away.score
-            const oppScore = isHome ? game.teams.away.score : game.teams.home.score
-            
-            if (game.status.detailedState === 'Final') {
-              const won = teamScore > oppScore
-              games.push({
-                date: new Date(game.gameDate).toLocaleDateString(),
-                opponent,
-                result: won ? 'W' : 'L',
-                score: `${teamScore}-${oppScore}`,
-                homeAway: isHome ? 'vs' : '@'
-              })
-            }
-          })
-        })
-        setTeamGames(games.slice(0, 10))
-      }
-    } catch (err) {
-      console.error('Error fetching team games:', err)
-      setTeamGames([])
-    } finally {
-      setTeamGamesLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    if (selectedTeamId) {
-      fetchTeamGames(selectedTeamId)
-    }
-  }, [selectedTeamId])
 
   const fetchMatchup = async (team1Id: string, team2Id: string) => {
     if (!team1Id || !team2Id) return
