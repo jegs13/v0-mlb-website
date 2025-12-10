@@ -6,7 +6,7 @@ export async function GET() {
     const apiKey = process.env.SPORTRADAR_API_KEY || 'your_api_key_here'
     
     const response = await fetch(
-      `https://api.sportradar.com/mlb/trial/v8/en/seasons/2025/REG/standings.json?api_key=${apiKey}`,
+      `https://api.sportradar.com/mlb/trial/v8/en/seasons/2024/REG/standings.json?api_key=${apiKey}`,
       {
         headers: {
           Accept: "application/json",
@@ -16,6 +16,8 @@ export async function GET() {
     )
 
     if (!response.ok) {
+      const errorText = await response.text()
+      console.error(`Sportradar API error: ${response.status} - ${errorText}`)
       throw new Error(`Sportradar API responded with status: ${response.status}`)
     }
 
@@ -25,7 +27,7 @@ export async function GET() {
   } catch (error) {
     console.error("Error fetching standings:", error)
     return NextResponse.json(
-      { error: "Failed to fetch standings data" },
+      { error: "Failed to fetch standings data", details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }

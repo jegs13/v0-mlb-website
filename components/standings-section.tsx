@@ -46,6 +46,8 @@ export function StandingsSection() {
       const response = await fetch('/api/standings')
       const data = await response.json()
       
+      console.log('Standings API Response:', data)
+      
       if (data.error) {
         throw new Error(data.error)
       }
@@ -135,7 +137,7 @@ export function StandingsSection() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
             <h2 className="text-3xl md:text-4xl font-black text-foreground uppercase tracking-tight">
-              2025 Standings
+              2024 Standings
             </h2>
             <p className="text-muted-foreground mt-1">Division leaders and wildcard race</p>
           </div>
