@@ -5,7 +5,6 @@ export async function GET() {
     const apiKey = process.env.SPORTRADAR_API_KEY
     
     console.log('API Key exists:', !!apiKey)
-    console.log('API Key length:', apiKey?.length)
     
     if (!apiKey) {
       return NextResponse.json(
@@ -14,6 +13,7 @@ export async function GET() {
       )
     }
     
+    // Corrected Sportradar API endpoint based on SDK usage
     const url = `https://api.sportradar.com/mlb/trial/v8/en/seasons/2024/REG/standings.json?api_key=${apiKey}`
     console.log('Fetching from URL:', url.replace(apiKey, 'HIDDEN'))
     
@@ -21,26 +21,26 @@ export async function GET() {
       headers: {
         Accept: "application/json",
       },
-      next: { revalidate: 3600 }, // Cache for 1 hour
+      cache: 'no-store', // Disable caching for debugging
     })
 
     console.log('Response status:', response.status)
-    console.log('Response headers:', Object.fromEntries(response.headers.entries()))
+    const responseText = await response.text()
+    console.log('Response text (first 500 chars):', responseText.substring(0, 500))
 
     if (!response.ok) {
-      const errorText = await response.text()
-      console.error(`Sportradar API error: ${response.status} - ${errorText}`)
+      console.error(`Sportradar API error: ${response.status} - ${responseText}`)
       return NextResponse.json(
         { 
           error: "Failed to fetch standings data", 
-          details: errorText,
+          details: responseText,
           status: response.status 
         },
-        { status: 500 }
+        { status: response.status }
       )
     }
 
-    const data = await response.json()
+    const data = JSON.parse(responseText)
     console.log('Successfully fetched standings data')
 
     return NextResponse.json(data)

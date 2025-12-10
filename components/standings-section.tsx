@@ -49,7 +49,8 @@ export function StandingsSection() {
       console.log('Standings API Response:', data)
       
       if (data.error) {
-        throw new Error(data.error)
+        console.error('API Error Details:', data)
+        throw new Error(data.error + (data.details ? ': ' + data.details : ''))
       }
 
       // Parse the Sportradar API response
