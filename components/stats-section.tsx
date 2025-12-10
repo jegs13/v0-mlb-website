@@ -528,7 +528,7 @@ export function StatsSection() {
                               const team1IsHome = game.teams.home.team.id === parseInt(selectedMatchupTeam1)
                               const team1Score = team1IsHome ? game.teams.home.score : game.teams.away.score
                               const team2Score = team1IsHome ? game.teams.away.score : game.teams.home.score
-                              const team1Won = team1IsHome ? game.teams.home.isWinner : game.teams.away.isWinner
+                              const team1Won = (team1Score || 0) > (team2Score || 0)
                               
                               return (
                                 <div
