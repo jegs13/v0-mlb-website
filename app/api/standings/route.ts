@@ -14,7 +14,7 @@ export async function GET() {
     }
     
     // Corrected Sportradar API endpoint based on SDK usage
-    const url = `https://api.sportradar.com/mlb/trial/v8/en/seasons/2024/REG/standings.json?api_key=${apiKey}`
+    const url = `https://api.sportradar.com/mlb/trial/v8/en/seasons/2025/REG/standings.json?api_key=${apiKey}`
     console.log('Fetching from URL:', url.replace(apiKey, 'HIDDEN'))
     
     const response = await fetch(url, {
