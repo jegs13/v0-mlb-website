@@ -83,6 +83,12 @@ export function StatsSection() {
   const [teamGamesLoading, setTeamGamesLoading] = useState(false)
   const [teams, setTeams] = useState<Array<{ id: number; name: string }>>([])
 
+  // Matchup state
+  const [selectedMatchupTeam1, setSelectedMatchupTeam1] = useState<string>("")
+  const [selectedMatchupTeam2, setSelectedMatchupTeam2] = useState<string>("")
+  const [matchupData, setMatchupData] = useState<any>(null)
+  const [matchupLoading, setMatchupLoading] = useState(false)
+
 
   const fetchStats = async () => {
     setIsLoading(true)
@@ -316,6 +322,54 @@ export function StatsSection() {
     }
   }, [selectedTeamId])
 
+  const fetchMatchup = async (team1Id: string, team2Id: string) => {
+    if (!team1Id || !team2Id) return
+    
+    setMatchupLoading(true)
+    try {
+      const response = await fetch(`/api/matchup?team1Id=${team1Id}&team2Id=${team2Id}`)
+      const data = await response.json()
+      
+      if (data.error) {
+        console.error('Error fetching matchup:', data.error)
+        setMatchupData(null)
+        return
+      }
+
+      // Calculate wins for each team
+      const team1Wins = data.games?.filter((game: any) => {
+        const team1IsHome = game.teams.home.team.id === parseInt(team1Id)
+        return team1IsHome ? game.teams.home.isWinner : game.teams.away.isWinner
+      }).length || 0
+
+      const team2Wins = data.games?.filter((game: any) => {
+        const team2IsHome = game.teams.home.team.id === parseInt(team2Id)
+        return team2IsHome ? game.teams.home.isWinner : game.teams.away.isWinner
+      }).length || 0
+
+      setMatchupData({
+        ...data,
+        record: {
+          team1Wins,
+          team2Wins
+        }
+      })
+    } catch (err) {
+      console.error('Error fetching matchup:', err)
+      setMatchupData(null)
+    } finally {
+      setMatchupLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (selectedMatchupTeam1 && selectedMatchupTeam2) {
+      fetchMatchup(selectedMatchupTeam1, selectedMatchupTeam2)
+    } else {
+      setMatchupData(null)
+    }
+  }, [selectedMatchupTeam1, selectedMatchupTeam2])
+
 
   const StatCard = ({ title, leaders, icon }: { title: string; leaders: StatLeader[]; icon: React.ReactNode }) => (
     <div className="bg-card rounded-lg border border-border overflow-hidden">
@@ -480,12 +534,135 @@ export function StatsSection() {
               </div>
             </div>
 
-            {/* Interactive Cards Section */}
+            {/* Team Matchup Section */}
             <div className="mt-12">
               <h3 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
                 <BarChart3 className="h-6 w-6 text-primary" />
-                Live Game Data
+                Team Matchup
               </h3>
+              <div className="bg-card rounded-lg border border-border overflow-hidden">
+                <div className="bg-primary/10 px-4 py-3 border-b border-border">
+                  <h3 className="font-bold text-foreground uppercase tracking-wide">Head-to-Head Comparison</h3>
+                </div>
+                <div className="p-4">
+                  {/* Team Selection */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                      <label className="block text-sm font-medium text-muted-foreground mb-2">Team 1</label>
+                      <select
+                        value={selectedMatchupTeam1}
+                        onChange={(e) => setSelectedMatchupTeam1(e.target.value)}
+                        className="w-full p-2 rounded-lg bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                      >
+                        <option value="">Select Team 1...</option>
+                        {teams.map((team) => (
+                          <option key={team.id} value={team.id}>
+                            {team.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-muted-foreground mb-2">Team 2</label>
+                      <select
+                        value={selectedMatchupTeam2}
+                        onChange={(e) => setSelectedMatchupTeam2(e.target.value)}
+                        className="w-full p-2 rounded-lg bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                      >
+                        <option value="">Select Team 2...</option>
+                        {teams.map((team) => (
+                          <option key={team.id} value={team.id}>
+                            {team.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {matchupLoading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                  ) : !selectedMatchupTeam1 || !selectedMatchupTeam2 ? (
+                    <p className="text-muted-foreground text-center py-12">Select two teams to compare their matchup</p>
+                  ) : matchupData ? (
+                    <div className="space-y-6">
+                      {/* Head-to-Head Record */}
+                      <div className="grid grid-cols-3 gap-4 items-center">
+                        <div className="text-center p-4 bg-muted/30 rounded-lg">
+                          <p className="text-3xl font-bold text-foreground">{matchupData.record.team1Wins}</p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {teams.find(t => t.id === parseInt(selectedMatchupTeam1))?.name || 'Team 1'} Wins
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-lg font-bold text-muted-foreground">VS</p>
+                        </div>
+                        <div className="text-center p-4 bg-muted/30 rounded-lg">
+                          <p className="text-3xl font-bold text-foreground">{matchupData.record.team2Wins}</p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {teams.find(t => t.id === parseInt(selectedMatchupTeam2))?.name || 'Team 2'} Wins
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Recent Games */}
+                      {matchupData.games.length > 0 && (
+                        <div>
+                          <h4 className="font-semibold text-foreground mb-3">2025 Season Games</h4>
+                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                            {matchupData.games.slice(0, 10).map((game: any) => {
+                              const team1IsHome = game.teams.home.team.id === parseInt(selectedMatchupTeam1)
+                              const team1Score = team1IsHome ? game.teams.home.score : game.teams.away.score
+                              const team2Score = team1IsHome ? game.teams.away.score : game.teams.home.score
+                              const team1Won = team1IsHome ? game.teams.home.isWinner : game.teams.away.isWinner
+                              
+                              return (
+                                <div
+                                  key={game.gamePk}
+                                  className={`p-3 rounded-lg border ${
+                                    game.status.statusCode === 'F' 
+                                      ? team1Won 
+                                        ? 'bg-green-500/10 border-green-500/30' 
+                                        : 'bg-red-500/10 border-red-500/30'
+                                      : 'bg-muted/30 border-border'
+                                  }`}
+                                >
+                                  <div className="flex justify-between items-center">
+                                    <div className="flex items-center gap-3">
+                                      <span className="text-sm font-semibold text-foreground">
+                                        {new Date(game.gameDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                      </span>
+                                      <span className="text-sm text-muted-foreground">
+                                        {game.teams.away.team.name} @ {game.teams.home.team.name}
+                                      </span>
+                                    </div>
+                                    {game.status.statusCode === 'F' && (
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-bold text-foreground">{team1Score} - {team2Score}</span>
+                                        <Badge variant={team1Won ? "default" : "secondary"} 
+                                               className={team1Won ? "bg-green-500" : "bg-red-500"}>
+                                          {team1Won ? 'W' : 'L'}
+                                        </Badge>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground text-center py-8">No matchup data available</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Team Recent Games Card */}
+            <div className="mt-8">
               <div className="grid gap-6 md:grid-cols-2">
                 {/* Today's Games Card */}
                 <div className="bg-card rounded-lg border border-border overflow-hidden">
